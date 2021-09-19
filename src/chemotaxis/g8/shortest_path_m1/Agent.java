@@ -24,7 +24,7 @@ public class Agent extends chemotaxis.sim.Agent {
 
 	private Optional<DirectionType> extract(int x) {
 		x &= 0b1111;
-		if (x == 0) return Optional.empty();
+		if ((x & 0b1000) == 0) return Optional.empty();
 		x -= 0b1000;
 		for (DirectionType dir: DirectionType.values()) {
 			if (dir.ordinal() == x) return Optional.of(dir);
@@ -67,7 +67,8 @@ public class Agent extends chemotaxis.sim.Agent {
 
 		Optional<DirectionType> last = extract(previousState);
 		Optional<DirectionType> last2 = extract(previousState >> 4);
-		if (last.isPresent() && last2.isPresent()) assert !last.get().equals(last2.get());
+
+		System.out.println("last: " + last + ", last2: " + last2);
 
 		double highestConcentration = -1;
 		for (DirectionType directionType : neighborMap.keySet()) {
@@ -76,18 +77,19 @@ public class Agent extends chemotaxis.sim.Agent {
 			if (last.isPresent() && last.get() == opposite(directionType)) multiplier = 0;
 			if (last.isPresent() && last.get() == directionType) multiplier = 2.0;
 			if (last2.isPresent() && last2.get() == opposite(directionType)) multiplier = 0.3;
-			if (highestConcentration <= neighborMap.get(directionType).getConcentration(chosenChemicalType) * multiplier) {
-				highestConcentration = neighborMap.get(directionType).getConcentration(chosenChemicalType) * multiplier;
+			double value = (neighborMap.get(directionType).getConcentration(chosenChemicalType) + 0.001) * multiplier;
+			if (highestConcentration <= value) {
+				highestConcentration = value;
 				move.directionType = directionType;
 			}
 		}
 		if (move.directionType != DirectionType.CURRENT) {
 			if (last.isEmpty()) move.currentState = encode(move.directionType);
-			else move.currentState = encode2(last.get(), move.directionType);
+			else if (last.get().compareTo(move.directionType) != 0) move.currentState = encode2(last.get(), move.directionType);
+			else move.currentState = previousState;
 		} else {
 			move.currentState = 0;
 		}
-
 
 		return move;
 	}
