@@ -150,12 +150,12 @@ public class Simulator {
 		}
 	}
 	
-	private static void readMap() throws FileNotFoundException, IOException {
+	private static void readMap() throws Exception {
 		if(mapName != null) {
 			File mapFile;
 			Scanner scanner;
 			try {
-				mapFile = new File(sourcePath + File.separator + "maps" + File.separator + teamName + File.separator + mapName);				
+				mapFile = new File(sourcePath + File.separator + "maps" + File.separator + teamName + File.separator + mapName);
 				scanner = new Scanner(mapFile);
 			} catch(FileNotFoundException e) {
                 throw new FileNotFoundException("Map file was not found!");
@@ -177,7 +177,7 @@ public class Simulator {
 				int startX = Integer.parseInt(startAndTargetElements[0]);
 				int startY = Integer.parseInt(startAndTargetElements[1]);
 				int targetX = Integer.parseInt(startAndTargetElements[2]);
-				int targetY = Integer.parseInt(startAndTargetElements[3]);	
+				int targetY = Integer.parseInt(startAndTargetElements[3]);
 				start = new Point(startX, startY);
 				agentLocations = new HashMap<Integer, Point>();
 				agentLocations.put(0, new Point(startX, startY));
@@ -201,14 +201,14 @@ public class Simulator {
 				scanner.close();
                 throw new IOException("Cannot interpret one or more blocked cells!");
 			}
-			
+
 			scanner.close();
-			
-			try {
+
+//			try {
 	        	controllerWrapper = loadControllerWrapper();
-			} catch (Exception e) {
-				Log.writeToLogFile("Unable to load controller: " + e.getMessage());
-			}
+//			} catch (Exception e) {
+//				Log.writeToLogFile("Unable to load controller: " + e.getMessage());
+//			}
 		}
 	}
 	
@@ -605,7 +605,7 @@ public class Simulator {
             throw new IOException("Cannot find the Java class loader!");
 
         @SuppressWarnings("rawtypes")
-        Class rawClass = loader.loadClass("chemotaxis." + teamName + ".Controller");
+        Class rawClass = loader.loadClass("chemotaxis." + teamName.replace('/', '.') + ".Controller");
         Class[] classArgs = new Class[]{Point.class, Point.class, Integer.class, ChemicalCell[][].class, Integer.class, Integer.class, Integer.class, SimPrinter.class};
 
         return (Controller) rawClass.getDeclaredConstructor(classArgs).newInstance(start, target, mapSize, grid, turns, budget, seed, new SimPrinter(enableControllerPrints));
@@ -652,7 +652,7 @@ public class Simulator {
             throw new IOException("Cannot find the Java class loader!");
 
         @SuppressWarnings("rawtypes")
-        Class rawClass = loader.loadClass("chemotaxis." + teamName + ".Agent");
+        Class rawClass = loader.loadClass("chemotaxis." + teamName.replace('/', '.') + ".Agent");
         Class[] classArgs = new Class[]{SimPrinter.class};
 
         return (Agent) rawClass.getDeclaredConstructor(classArgs).newInstance(new SimPrinter(enableAgentPrints));
@@ -861,7 +861,7 @@ public class Simulator {
         return jsonObj.toString();
 	}
 	
-	public static void main(String[] args) throws IOException, JSONException {
+	public static void main(String[] args) throws Exception {
 		setup();
 		parseCommandLineArguments(args);
 		readMap();
