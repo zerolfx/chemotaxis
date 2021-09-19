@@ -53,6 +53,9 @@ for folder in os.listdir(CUR_DIR):
 
     shutil.rmtree(temp_dir)
 
+for file in ['Agent.java', 'Controller.java']:
+    os.remove(os.path.join(CUR_DIR, file))
+
 print(subprocess.check_output("make clean".split(), cwd=BASEDIR))
 
 print(result)
