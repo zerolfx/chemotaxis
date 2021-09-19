@@ -15,12 +15,12 @@ with open(file[:-4], 'w') as f:
     for i in range(n):
         for j in range(n):
             if img.getpixel((i, j)) == (0, 0, 255):
-                print(i + 1, j + 1, end=' ')
+                print(j + 1, i + 1, end=' ')
     for i in range(n):
         for j in range(n):
             if img.getpixel((i, j)) == (0, 255, 0):
-                print(i + 1, j + 1)
+                print(j + 1, i + 1)
     for i in range(n):
         for j in range(n):
             if img.getpixel((i, j)) == (0, 0, 0):
-                print(i + 1, j + 1)
+                print(j + 1, i + 1)
