@@ -1,9 +1,9 @@
 import os
 import shutil
-# r, b, time
 import subprocess
 from collections import defaultdict
 
+# r, b, time
 CONFIG = [
     (20, 50, 100),
     (20, 30, 100),
@@ -15,7 +15,7 @@ CONFIG = [
 
 TEAM = 'g8'
 
-COMMAND = "java -cp .:chemotaxis/org.json.jar chemotaxis.sim.Simulator --team {team_name} --spawnFreq {r} --budget {b} -m {map_name} --turns {time} -v -s 10 -l log.txt"
+COMMAND = "java -cp .:chemotaxis/org.json.jar chemotaxis.sim.Simulator --team {team_name} --spawnFreq {r} --budget {b} -m {map_name} --turns {time} -s 10 -l log.txt "
 
 result = defaultdict(lambda: defaultdict(dict))
 
