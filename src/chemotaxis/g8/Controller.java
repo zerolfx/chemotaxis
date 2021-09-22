@@ -98,31 +98,19 @@ public class Controller extends chemotaxis.sim.Controller {
 	@Override
 	public ChemicalPlacement applyChemicals(Integer currentTurn, Integer chemicalsRemaining, ArrayList<Point> locations, ChemicalCell[][] grid) {
 		ChemicalPlacement res = new ChemicalPlacement();
-		res.chemicals.add(ChemicalType.BLUE);
+
 
 		// this should check to make sure all agents are on right path
-		for (int i=0; i<locations.size(); i++) {
-			Point agent_location = locations.get(i);
-			if (!shortestPath.contains(agent_location)){
-				Point above = new Point(agent_location.x, agent_location.y - 1);
-				Point below = new Point(agent_location.x, agent_location.y + 1);
-				Point right = new Point(agent_location.x + 1, agent_location.y);
-				Point left = new Point(agent_location.x - 1, agent_location.y);
-				if (shortestPath.contains(above)) {
-					res.location = above;
-					return res;
-				}
-				if (shortestPath.contains(below)) {
-					res.location = below;
-					return res;
-				}
-				if (shortestPath.contains(right)) {
-					res.location = right;
-					return res;
-				}
-				if (shortestPath.contains(left)) {
-					res.location = left;
-					return res;
+		for (Point agentLocation: locations) {
+			if (!shortestPath.contains(agentLocation)){
+				offset += 1;
+				for (int i = 0; i < 4; ++i) {
+					Point v = new Point(agentLocation.x + DIR[i][0], agentLocation.y + DIR[i][1]);
+					if (shortestPath.contains(v)) {
+						res.location = v;
+						res.chemicals.add(ChemicalType.RED);
+						return res;
+					}
 				}
 			}
 		}
@@ -138,6 +126,7 @@ public class Controller extends chemotaxis.sim.Controller {
 		if ((currentTurn - offset) % INTERVAL == 0) {
 			int d = (currentTurn - offset) / INTERVAL;
 			if (d < selectedCells.size()) {
+				res.chemicals.add(ChemicalType.BLUE);
 				res.location = selectedCells.get(d);
 				return res;
 			}
