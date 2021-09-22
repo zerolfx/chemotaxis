@@ -73,11 +73,11 @@ public class Agent extends chemotaxis.sim.Agent {
 		double highestConcentration = -1;
 		for (DirectionType directionType : neighborMap.keySet()) {
 			if (neighborMap.get(directionType).isBlocked()) continue;
-			if (neighborMap.get(directionType).getConcentration(ChemicalType.RED) > 0.99) {
-				move.currentState = last2.map(this::encode).orElse((byte)0);
-				move.directionType = directionType;
-				return move;
-			}
+//			if (neighborMap.get(directionType).getConcentration(ChemicalType.RED) > 0.99) {
+//				move.currentState = last2.map(this::encode).orElse((byte)0);
+//				move.directionType = directionType;
+//				return move;
+//			}
 			double multiplier = 1.0;
 			if (last.isPresent() && directionType.equals(DirectionType.CURRENT)) multiplier = 0.1;
 			if (last.isPresent() && last.get() == opposite(directionType)) multiplier = 0;
