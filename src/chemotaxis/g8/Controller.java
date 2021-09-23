@@ -31,9 +31,9 @@ public class Controller extends chemotaxis.sim.Controller {
 		boolean[][] vis = new boolean[size + 1][size + 1];
 		ArrayList<Point> res = new ArrayList<>();
 		int turn = 0;
+		Point cur = moveByDT(start, dt);
+		if (isBlocked(cur)) return null;
 		if (mode >= 1 && mode <= 4) { // turn left right l&r r&l
-			Point cur = moveByDT(start, dt);
-			if (isBlocked(cur)) return null;
 			while (true) {
 				res.add(cur);
 				turn += 1;
@@ -50,6 +50,26 @@ public class Controller extends chemotaxis.sim.Controller {
 					}
 					nxt = moveByDT(cur, dt);
 				}
+				if (vis[nxt.x][nxt.y]) return res;
+				vis[nxt.x][nxt.y] = true;
+				cur = nxt;
+			}
+		} else if (mode <= 6) {
+			while (true) {
+				res.add(cur);
+				Point nxt = null;
+				if (mode == 5) {
+					for (int i = 5; i >= 2; --i) {
+						nxt = moveByDT(cur, (dt + i) % 4);
+						if (!isBlocked(nxt)) { dt = (dt + i) % 4; break; }
+					}
+				} else if (mode == 6) {
+					for (int i = 3; i <= 6; ++i) {
+						nxt = moveByDT(cur, (dt + i) % 4);
+						if (!isBlocked(nxt)) { dt = (dt + i) % 4; break; }
+					}
+				}
+				assert nxt != null;
 				if (vis[nxt.x][nxt.y]) return res;
 				vis[nxt.x][nxt.y] = true;
 				cur = nxt;
@@ -107,7 +127,7 @@ public class Controller extends chemotaxis.sim.Controller {
 			if (u.equals(target)) break;
 			Point cur = uu.from;
 //			System.out.println(cur);
-			for (int mode = 1; mode <= 4; ++mode) {
+			for (int mode = 1; mode <= 6; ++mode) {
 				for (int dt = 0; dt < 4; ++dt) {
 					ArrayList<Point> path = generatePath(cur, mode, dt);
 //					System.out.println(mode + " " + dt + " " + path);
@@ -153,17 +173,9 @@ public class Controller extends chemotaxis.sim.Controller {
 		if (!solution.containsKey(currentTurn)) return res;
 		Status s = solution.get(currentTurn);
 		res.location = moveByDT(s.from, s.dt);
-		if (s.mode == 1) {
-			res.chemicals.add(ChemicalType.BLUE);
-		} else if (s.mode == 2) {
-			res.chemicals.add(ChemicalType.RED);
-		} else if (s.mode == 3) {
-			res.chemicals.add(ChemicalType.BLUE);
-			res.chemicals.add(ChemicalType.GREEN);
-		} else if (s.mode == 4) {
-			res.chemicals.add(ChemicalType.RED);
-			res.chemicals.add(ChemicalType.GREEN);
-		}
+		if ((s.mode & 1) > 0) res.chemicals.add(ChemicalType.BLUE);
+		if ((s.mode & 2) > 0) res.chemicals.add(ChemicalType.RED);
+		if ((s.mode & 4) > 0) res.chemicals.add(ChemicalType.GREEN);
 		return res;
 	}
 }

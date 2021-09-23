@@ -47,14 +47,14 @@ public class Agent extends chemotaxis.sim.Agent {
 		int lastMode = decodeMode(previousState);
 		DirectionType lastDT = decodeDT(previousState);
 		boolean lastTurn = decodeTurn(previousState);
-		System.out.println("Agent: " + lastDT + "  " + lastDT);
+		System.out.println("Agent: " + lastDT + "  " + lastMode);
 
 		for (DirectionType dt: neighborMap.keySet()) {
 			ChemicalCell cell = neighborMap.get(dt);
 			int mode = 0;
 			if (cell.getConcentration(ChemicalType.BLUE) > 0.99) mode += 1;
 			if (cell.getConcentration(ChemicalType.RED) > 0.99) mode += 2;
-			if (cell.getConcentration(ChemicalType.GREEN) > 0.99) mode += 2;
+			if (cell.getConcentration(ChemicalType.GREEN) > 0.99) mode += 4;
 			if (mode != 0) {
 				System.out.println("Agent Ins: " + dt + "  " + mode);
 				move.directionType = dt;
@@ -69,19 +69,26 @@ public class Agent extends chemotaxis.sim.Agent {
 			return move;
 		}
 
-
-		if (neighborMap.get(lastDT).isBlocked()) {
-			System.out.println("Agent Hit Wall!");
-			if (lastMode == 1) {
-				lastDT = turnLeft(lastDT);
-			} else if (lastMode == 2) {
-				lastDT = turnRight(lastDT);
-			} else if (lastMode == 3) {
-				lastDT = lastTurn ? turnLeft(lastDT) : turnRight(lastDT);
-			} else if (lastMode == 4) {
-				lastDT = !lastTurn ? turnLeft(lastDT) : turnRight(lastDT);
+		if (1 <= lastMode && lastMode <= 4) {
+			if (neighborMap.get(lastDT).isBlocked()) {
+				System.out.println("Agent Hit Wall!");
+				lastDT = switch (lastMode) {
+					case 1 -> turnLeft(lastDT);
+					case 2 -> turnRight(lastDT);
+					case 3 -> lastTurn ? turnLeft(lastDT) : turnRight(lastDT);
+					case 4 -> !lastTurn ? turnLeft(lastDT) : turnRight(lastDT);
+					default -> throw new IllegalStateException("Unexpected value: " + lastMode);
+				};
 			}
+		} else if (lastMode == 5) {
+			lastDT = turnLeft(lastDT);
+			while (neighborMap.get(lastDT).isBlocked()) lastDT = turnRight(lastDT);
+		} else if (lastMode == 6) {
+			lastDT = turnRight(lastDT);
+			while (neighborMap.get(lastDT).isBlocked()) lastDT = turnLeft(lastDT);
 		}
+
+
 		move.directionType = lastDT;
 		lastTurn = !lastTurn;
 		move.currentState = encode(lastDT, lastMode, lastTurn);
