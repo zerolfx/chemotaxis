@@ -155,13 +155,31 @@ public class Controller extends chemotaxis.sim.Controller {
 		}
 	}
 
-
 	public Controller(Point start, Point target, Integer size, ChemicalCell[][] grid, Integer simTime, Integer budget, Integer seed, SimPrinter simPrinter, Integer agentGoal, Integer spawnFreq) {
 		super(start, target, size, grid, simTime, budget, seed, simPrinter, agentGoal, spawnFreq);
 		this.size = size;
 		this.G = grid;
 		this.solution = new HashMap<>();
+		System.out.println("Precalculating...");
 		precompute(start, target, simTime, budget, agentGoal);
+		int delay = 1;
+		Map<Integer, Status> oSolution = new HashMap<>(solution);
+		for (int agentNumber = 1; agentNumber < agentGoal; ++agentNumber) {
+			while (true) {
+				int shift = spawnFreq * agentNumber + delay;
+				boolean flag = true;
+				for (int t: oSolution.keySet()) {
+					if (solution.containsKey(t + shift)) { flag = false; break; }
+				}
+				if (flag) {
+					for (Map.Entry<Integer, Status> kv: oSolution.entrySet()) {
+						solution.put(kv.getKey() + shift, kv.getValue());
+					}
+					break;
+				}
+				delay += 1;
+			}
+		}
 	}
 
 
