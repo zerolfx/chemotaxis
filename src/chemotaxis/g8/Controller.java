@@ -114,6 +114,8 @@ public class Controller extends chemotaxis.sim.Controller {
 		}
 	}
 
+	private int modeCost(int x) { return (x & 1) + ((x >> 1) & 1) + ((x >> 2) & 1); }
+
 	private void precompute(Point start, Point target, int timeLimit, int chemLimit, int goal) {
 		Status[][] f = new Status[size + 1][size + 1];
 		f[start.x][start.y] = new Status(0, 0, null);
@@ -134,7 +136,7 @@ public class Controller extends chemotaxis.sim.Controller {
 					if (path == null) continue;
 					for (int i = 0; i < path.size(); ++i) {
 						Point nxt = path.get(i);
-						Status s = new Status(u.cost + 1, u.time + i + 1, cur);
+						Status s = new Status(u.cost + modeCost(mode), u.time + i + 1, cur);
 						s.mode = mode; s.dt = dt;
 						if (f[nxt.x][nxt.y] == null || f[nxt.x][nxt.y].getV() > s.getV()) {
 							f[nxt.x][nxt.y] = s;
