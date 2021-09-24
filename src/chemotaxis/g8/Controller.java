@@ -182,11 +182,10 @@ public class Controller extends chemotaxis.sim.Controller {
 
 
 		precompute(start, target);
-		int delay = 0;
+		int delay = 1;
 		Map<Integer, Status> oSolution = new HashMap<>(solution);
 		for (int agentNumber = 1; agentNumber < agentGoal; ++agentNumber) {
 			while (true) {
-				delay += 1;
 				int shift = spawnFreq * agentNumber + delay;
 				boolean flag = true;
 				for (int t: oSolution.keySet()) {
@@ -200,6 +199,7 @@ public class Controller extends chemotaxis.sim.Controller {
 				}
 				delay += 1;
 			}
+			delay = (delay + spawnFreq - 1) / spawnFreq * spawnFreq;
 		}
 	}
 
