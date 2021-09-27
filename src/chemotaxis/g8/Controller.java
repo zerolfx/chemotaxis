@@ -51,7 +51,7 @@ public class Controller extends chemotaxis.sim.Controller {
 		int turn = 0;
 		Point cur = moveByDT(start, dt);
 		if (isBlocked(cur)) return null;
-		if (mode >= 1 && mode <= 4) { // turn left right l&r r&l
+		if (mode > 2) { // turn left right l&r r&l
 			while (true) {
 				if (vis[cur.x][cur.y][dt] > 0) return res;
 				for (int i = 0; i < 4; ++i) if (vis[cur.x][cur.y][i] != 0 && vis[cur.x][cur.y][i] <= turn - spawnFreq + 1) return res;
@@ -60,11 +60,11 @@ public class Controller extends chemotaxis.sim.Controller {
 				res.add(cur);
 				Point nxt = moveByDT(cur, dt);
 				while (isBlocked(nxt)) {
-					if (mode == 1) {
+					if (mode == 3) {
 						dt = (dt + 1) % 4;
-					} else if (mode == 2) {
+					} else if (mode == 4) {
 						dt = (dt + 3) % 4;
-					} else if (mode == 3) {
+					} else if (mode == 5) {
 						dt = (dt + (turn % 2 == 0 ? 1 : 3)) % 4;
 					} else {
 						dt = (dt + (turn % 2 == 0 ? 3 : 1)) % 4;
@@ -73,7 +73,7 @@ public class Controller extends chemotaxis.sim.Controller {
 				}
 				cur = nxt;
 			}
-		} else if (mode <= 6) {
+		} else {
 			while (true) {
 				if (vis[cur.x][cur.y][dt] > 0) return res;
 				for (int i = 0; i < 4; ++i) if (vis[cur.x][cur.y][i] != 0 && vis[cur.x][cur.y][i] <= turn - spawnFreq) return res;
@@ -81,12 +81,12 @@ public class Controller extends chemotaxis.sim.Controller {
 				vis[cur.x][cur.y][dt] = turn;
 				res.add(cur);
 				Point nxt = null;
-				if (mode == 5) {
+				if (mode == 1) {
 					for (int i = 5; i >= 2; --i) {
 						nxt = moveByDT(cur, (dt + i) % 4);
 						if (!isBlocked(nxt)) { dt = (dt + i) % 4; break; }
 					}
-				} else if (mode == 6) {
+				} else if (mode == 2) {
 					for (int i = 3; i <= 6; ++i) {
 						nxt = moveByDT(cur, (dt + i) % 4);
 						if (!isBlocked(nxt)) { dt = (dt + i) % 4; break; }
@@ -96,7 +96,6 @@ public class Controller extends chemotaxis.sim.Controller {
 				cur = nxt;
 			}
 		}
-		return null;
 	}
 
 	static class Status {
@@ -173,6 +172,7 @@ public class Controller extends chemotaxis.sim.Controller {
 		this.size = size;
 		this.G = grid;
 		this.solution = new HashMap<>();
+		spawnFreq = Math.max(spawnFreq, 3);
 		this.spawnFreq = spawnFreq;
 
 //		this.sp = new int[size + 1][size + 1];

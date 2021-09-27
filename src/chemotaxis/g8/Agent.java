@@ -69,21 +69,21 @@ public class Agent extends chemotaxis.sim.Agent {
 			return move;
 		}
 
-		if (1 <= lastMode && lastMode <= 4) {
+		if (3 <= lastMode && lastMode <= 6) {
 			if (neighborMap.get(lastDT).isBlocked()) {
 				System.out.println("Agent Hit Wall!");
 				lastDT = switch (lastMode) {
-					case 1 -> turnLeft(lastDT);
-					case 2 -> turnRight(lastDT);
-					case 3 -> lastTurn ? turnLeft(lastDT) : turnRight(lastDT);
-					case 4 -> !lastTurn ? turnLeft(lastDT) : turnRight(lastDT);
+					case 3 -> turnLeft(lastDT);
+					case 4 -> turnRight(lastDT);
+					case 5 -> lastTurn ? turnLeft(lastDT) : turnRight(lastDT);
+					case 6 -> !lastTurn ? turnLeft(lastDT) : turnRight(lastDT);
 					default -> throw new IllegalStateException("Unexpected value: " + lastMode);
 				};
 			}
-		} else if (lastMode == 5) {
+		} else if (lastMode == 1) {
 			lastDT = turnLeft(lastDT);
 			while (neighborMap.get(lastDT).isBlocked()) lastDT = turnRight(lastDT);
-		} else if (lastMode == 6) {
+		} else if (lastMode == 2) {
 			lastDT = turnRight(lastDT);
 			while (neighborMap.get(lastDT).isBlocked()) lastDT = turnLeft(lastDT);
 		}
