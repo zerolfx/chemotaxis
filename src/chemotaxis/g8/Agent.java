@@ -23,22 +23,22 @@ public class Agent extends chemotaxis.sim.Agent {
 	}
 
 	private DirectionType turnLeft(DirectionType dt) {
-		return switch (dt) {
-			case NORTH -> DirectionType.WEST;
-			case SOUTH -> DirectionType.EAST;
-			case EAST -> DirectionType.NORTH;
-			case WEST -> DirectionType.SOUTH;
-			case CURRENT -> DirectionType.CURRENT;
+		switch (dt) {
+			case NORTH: return DirectionType.WEST;
+			case SOUTH: return DirectionType.EAST;
+			case EAST: return DirectionType.NORTH;
+			case WEST: return DirectionType.SOUTH;
 		};
+		return DirectionType.CURRENT;
 	}
 	private DirectionType turnRight(DirectionType dt) {
-		return switch (dt) {
-			case NORTH -> DirectionType.EAST;
-			case SOUTH -> DirectionType.WEST;
-			case EAST -> DirectionType.SOUTH;
-			case WEST -> DirectionType.NORTH;
-			case CURRENT -> DirectionType.CURRENT;
+		switch (dt) {
+			case NORTH: return DirectionType.EAST;
+			case SOUTH: return DirectionType.WEST;
+			case EAST: return DirectionType.SOUTH;
+			case WEST: return DirectionType.NORTH;
 		};
+		return DirectionType.CURRENT;
 	}
 
 	@Override
@@ -72,12 +72,11 @@ public class Agent extends chemotaxis.sim.Agent {
 		if (3 <= lastMode && lastMode <= 6) {
 			if (neighborMap.get(lastDT).isBlocked()) {
 				System.out.println("Agent Hit Wall!");
-				lastDT = switch (lastMode) {
-					case 3 -> turnLeft(lastDT);
-					case 4 -> turnRight(lastDT);
-					case 5 -> lastTurn ? turnLeft(lastDT) : turnRight(lastDT);
-					case 6 -> !lastTurn ? turnLeft(lastDT) : turnRight(lastDT);
-					default -> throw new IllegalStateException("Unexpected value: " + lastMode);
+				switch (lastMode) {
+					case 3: lastDT = turnLeft(lastDT); break;
+					case 4: lastDT = turnRight(lastDT); break;
+					case 5: lastDT = lastTurn ? turnLeft(lastDT) : turnRight(lastDT); break;
+					case 6: lastDT = !lastTurn ? turnLeft(lastDT) : turnRight(lastDT); break;
 				};
 			}
 		} else if (lastMode == 1) {
