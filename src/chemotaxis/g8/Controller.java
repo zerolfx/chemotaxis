@@ -116,7 +116,7 @@ public class Controller extends chemotaxis.sim.Controller {
 		}
 
 		public int getV() {
-			return this.cost * 1000 + this.time;
+			return this.cost * 50 + this.time;
 		}
 	}
 
