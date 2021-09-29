@@ -58,7 +58,7 @@ public class Controller extends chemotaxis.sim.Controller {
 		} else {
 			while (true) {
 				if (vis[cur.x][cur.y][dt] > 0) return res;
-				for (int i = 0; i < 4; ++i) if (vis[cur.x][cur.y][i] != 0 && vis[cur.x][cur.y][i] <= turn - spawnFreq) return res;
+				for (int i = 0; i < 4; ++i) if (vis[cur.x][cur.y][i] != 0 && vis[cur.x][cur.y][i] <= turn - spawnFreq + 1) return res;
 				turn += 1;
 				vis[cur.x][cur.y][dt] = turn;
 				res.add(cur);
@@ -152,11 +152,11 @@ public class Controller extends chemotaxis.sim.Controller {
 		this.solution.clear();
 
 		int costForOne = precompute(start, target);
-		int delay = 1;
+		int delay = 0;
 		Map<Integer, Status> oSolution = new HashMap<>(solution);
 		for (int agentNumber = 1; agentNumber < agentGoal; ++agentNumber) {
 			while (true) {
-				int shift = spawnFreq * agentNumber + delay;
+				int shift = spawnFreq * agentNumber + delay + 1;
 				boolean flag = true;
 				for (int t: oSolution.keySet()) {
 					if (solution.containsKey(t + shift)) { flag = false; break; }
@@ -165,6 +165,7 @@ public class Controller extends chemotaxis.sim.Controller {
 					for (Map.Entry<Integer, Status> kv: oSolution.entrySet()) {
 						solution.put(kv.getKey() + shift, kv.getValue());
 					}
+					System.out.println(shift);
 					break;
 				}
 				delay += 1;
