@@ -10,7 +10,7 @@ import java.util.*;
 
 public class Controller extends chemotaxis.sim.Controller {
 	static int[][] DIR = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}}; // down right up left   +1: turn left; -1: turn right
-	int size, spawnFreq;
+	int size, spawnFreq, budget;
 	Map<Integer, Status> solution;
 	ChemicalCell[][] G;
 	int alpha;
@@ -151,13 +151,21 @@ public class Controller extends chemotaxis.sim.Controller {
 		System.out.println("Precalculating...   alpha = " + alpha);
 		this.solution.clear();
 
+		Status res = new Status(-1, -1, null);
+
 		int costForOne = precompute(start, target);
+		int timeForOne = solution.keySet().stream().max(Integer::compare).get();
 		int delay = 0;
 		Map<Integer, Status> oSolution = new HashMap<>(solution);
-		for (int agentNumber = 1; agentNumber < agentGoal; ++agentNumber) {
+		for (int agentNumber = 1; agentNumber < Math.min(agentGoal, budget / costForOne); ++agentNumber) {
+			boolean timeLimitExceed = false;
 			while (true) {
 				int shift = spawnFreq * agentNumber + delay + 1;
 				boolean flag = true;
+				if (shift + timeForOne > simTime) {
+					timeLimitExceed = true;
+					break;
+				}
 				for (int t: oSolution.keySet()) {
 					if (solution.containsKey(t + shift)) { flag = false; break; }
 				}
@@ -171,11 +179,13 @@ public class Controller extends chemotaxis.sim.Controller {
 				delay += 1;
 			}
 			delay = (delay + spawnFreq - 1) / spawnFreq * spawnFreq;
+			if (timeLimitExceed) break;
+			res.mode = agentNumber;
 		}
 
-		int totalTime = solution.keySet().stream().max(Integer::compare).get();
-		int totalChemicals = costForOne * agentGoal;
-		return new Status(totalChemicals, totalTime, null);
+		res.time = solution.keySet().stream().max(Integer::compare).get();
+		res.cost = costForOne * agentGoal;
+		return res;
 	}
 
 
@@ -185,15 +195,31 @@ public class Controller extends chemotaxis.sim.Controller {
 		this.size = size;
 		this.G = grid;
 		this.solution = new HashMap<>();
+		this.budget = budget;
 		spawnFreq = Math.max(spawnFreq, 3);
 		this.spawnFreq = spawnFreq;
+
+		boolean solved = false;
+		Map<Integer, Status> best = null;
+		int reached = -1;
 
 		for (int a: new int[]{1000, 100, 50, 25, 20, 15, 12, 10, 7, 5, 2}) {
 			Status s = solve(a);
 			System.out.println(s);
-			if (s.time < simTime && s.cost <= budget) {
+			if (s.time < simTime && s.cost <= budget && s.mode == agentGoal) {
+				solved = true;
 				break;
 			}
+			if (s.mode > reached) {
+				reached = s.mode;
+				best = Map.copyOf(solution);
+			}
+		}
+
+		System.out.println("Solved: " + solved + " Reached: " + reached);
+
+		if (!solved) {
+			solution = best;
 		}
 	}
 
