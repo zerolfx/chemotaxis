@@ -206,7 +206,7 @@ public class Controller extends chemotaxis.sim.Controller {
 		for (int a: new int[]{1000, 100, 50, 25, 20, 15, 12, 10, 7, 5, 2}) {
 			Status s = solve(a);
 			System.out.println(s);
-			if (s.time < simTime && s.cost <= budget && s.mode == agentGoal) {
+			if (s.time < simTime && s.cost <= budget && s.mode == agentGoal - 1) {
 				solved = true;
 				break;
 			}
